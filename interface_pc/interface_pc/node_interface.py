@@ -10,7 +10,7 @@ from geometry_msgs.msg import Twist
 import rclpy
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
-from std_msgs.msg import String
+from std_msgs.msg import Float32, Int32, String
 
 from PyQt5.QtCore import QPointF, QRectF, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QColor, QFont, QPainter, QPen
@@ -47,12 +47,42 @@ class RobotGuiNode(Node):
 
         self.cmd_vel_publisher = self.create_publisher(Twist, CMD_VEL_TOPIC, 10)
         self.face_publisher = self.create_publisher(String, FACE_TOPIC, 10)
+        self.create_subscription(
+            Float32,
+            'roboclaw/cmd_speed/left',
+            lambda msg: self.motor_speed_callback('left', msg.data),
+            10,
+        )
+        self.create_subscription(
+            Float32,
+            'roboclaw/cmd_speed/right',
+            lambda msg: self.motor_speed_callback('right', msg.data),
+            10,
+        )
+        self.create_subscription(
+            Int32,
+            'roboclaw/cmd_ticks/left',
+            lambda msg: self.motor_ticks_callback('left', msg.data),
+            10,
+        )
+        self.create_subscription(
+            Int32,
+            'roboclaw/cmd_ticks/right',
+            lambda msg: self.motor_ticks_callback('right', msg.data),
+            10,
+        )
 
         self.last_twist_payload = None
         self.last_twist_sent = 0.0
         self.last_face_sent = 0.0
+        self.last_motor_data_seen = 0.0
+        self.left_motor_mps = None
+        self.right_motor_mps = None
+        self.left_motor_ticks = None
+        self.right_motor_ticks = None
         self.motion_text = f'{CMD_VEL_TOPIC}: waiting'
         self.face_text = f'{FACE_TOPIC}: waiting'
+        self.motor_text = 'Motores: esperando roboclaw'
 
     def send_twist(self, linear_x, angular_z, force=False):
         linear_x = float(clamp(linear_x, -MAX_LINEAR_SPEED_MPS, MAX_LINEAR_SPEED_MPS))
@@ -94,6 +124,31 @@ class RobotGuiNode(Node):
 
         self.last_face_sent = time.monotonic()
         self.face_text = f'{FACE_TOPIC}: {expression}'
+
+    def motor_speed_callback(self, side, value):
+        if side == 'left':
+            self.left_motor_mps = float(value)
+        else:
+            self.right_motor_mps = float(value)
+        self.update_motor_text()
+
+    def motor_ticks_callback(self, side, value):
+        if side == 'left':
+            self.left_motor_ticks = int(value)
+        else:
+            self.right_motor_ticks = int(value)
+        self.update_motor_text()
+
+    def update_motor_text(self):
+        self.last_motor_data_seen = time.monotonic()
+        left_mps = format_float(self.left_motor_mps, 'm/s')
+        right_mps = format_float(self.right_motor_mps, 'm/s')
+        left_ticks = format_int(self.left_motor_ticks, 'ticks/s')
+        right_ticks = format_int(self.right_motor_ticks, 'ticks/s')
+        self.motor_text = (
+            f'Motores: izq={left_mps} ({left_ticks}), '
+            f'der={right_mps} ({right_ticks})'
+        )
 
 
 class AnalogPad(QWidget):
@@ -170,14 +225,14 @@ class AnalogPad(QWidget):
             'ATRAS',
         )
         painter.drawText(
-            QRectF(center.x() - radius - 4, center.y() - 9, 62, 18),
+            QRectF(center.x() - radius - 20, center.y() - 9, 92, 18),
             Qt.AlignCenter,
-            'IZQ',
+            'GIRA IZQ',
         )
         painter.drawText(
-            QRectF(center.x() + radius - 58, center.y() - 9, 62, 18),
+            QRectF(center.x() + radius - 72, center.y() - 9, 92, 18),
             Qt.AlignCenter,
-            'DER',
+            'GIRA DER',
         )
 
         knob_x = center.x() - self._angular_axis * radius
@@ -214,6 +269,8 @@ class RobotGui(QMainWindow):
         self.pad_angular_axis = 0.0
         self.button_linear_axis = 0.0
         self.button_angular_axis = 0.0
+        self.active_motion_button = None
+        self.motion_buttons = {}
 
         self.setWindowTitle('Robot diferencial')
         self.setMinimumSize(800, 560)
@@ -241,6 +298,11 @@ class RobotGui(QMainWindow):
             QPushButton:pressed {
                 background: #dbeafe;
                 border-color: #3b82f6;
+            }
+            QPushButton:checked {
+                background: #dcfce7;
+                border-color: #15803d;
+                color: #166534;
             }
             QLabel { color: #1f2937; }
         """)
@@ -292,7 +354,7 @@ class RobotGui(QMainWindow):
 
     def build_button_controls(self):
         button_box = QGroupBox('Botones')
-        button_box.setFixedWidth(250)
+        button_box.setFixedWidth(390)
         layout = QGridLayout()
 
         forward = QPushButton('Adelante')
@@ -304,14 +366,27 @@ class RobotGui(QMainWindow):
         for button in (forward, backward, left, right, stop):
             button.setMinimumHeight(56)
 
-        forward.pressed.connect(lambda: self.set_button_axes(1.0, 0.0))
-        forward.released.connect(lambda: self.set_button_axes(0.0, 0.0))
-        backward.pressed.connect(lambda: self.set_button_axes(-1.0, 0.0))
-        backward.released.connect(lambda: self.set_button_axes(0.0, 0.0))
-        left.pressed.connect(lambda: self.set_button_axes(0.0, 1.0))
-        left.released.connect(lambda: self.set_button_axes(0.0, 0.0))
-        right.pressed.connect(lambda: self.set_button_axes(0.0, -1.0))
-        right.released.connect(lambda: self.set_button_axes(0.0, 0.0))
+        self.motion_buttons = {
+            'forward': forward,
+            'backward': backward,
+            'left': left,
+            'right': right,
+        }
+        for button in self.motion_buttons.values():
+            button.setCheckable(True)
+
+        forward.clicked.connect(
+            lambda _=False: self.toggle_button_motion('forward', 1.0, 0.0)
+        )
+        backward.clicked.connect(
+            lambda _=False: self.toggle_button_motion('backward', -1.0, 0.0)
+        )
+        left.clicked.connect(
+            lambda _=False: self.toggle_button_motion('left', 0.0, 1.0)
+        )
+        right.clicked.connect(
+            lambda _=False: self.toggle_button_motion('right', 0.0, -1.0)
+        )
         stop.clicked.connect(self.stop_motion)
 
         layout.addWidget(forward, 0, 1)
@@ -332,6 +407,7 @@ class RobotGui(QMainWindow):
         readout_layout = QVBoxLayout()
         self.axes_label = QLabel('Entrada: lineal=+0.00, angular=+0.00')
         self.command_label = QLabel(self.node.motion_text)
+        self.motor_label = QLabel(self.node.motor_text)
         self.face_label = QLabel(self.node.face_text)
         self.max_speed_label = QLabel()
         self.max_speed_label.setText(self.limit_label.text())
@@ -339,6 +415,7 @@ class RobotGui(QMainWindow):
         for label in (
             self.axes_label,
             self.command_label,
+            self.motor_label,
             self.face_label,
             self.max_speed_label,
         ):
@@ -347,6 +424,7 @@ class RobotGui(QMainWindow):
 
         readout_layout.addWidget(self.axes_label)
         readout_layout.addWidget(self.command_label)
+        readout_layout.addWidget(self.motor_label)
         readout_layout.addWidget(self.face_label)
         readout_layout.addWidget(self.max_speed_label)
         readout_layout.addStretch(1)
@@ -386,7 +464,7 @@ class RobotGui(QMainWindow):
         self.motion_badge = self.make_badge()
         self.face_badge = self.make_badge()
 
-        status_layout.addWidget(QLabel('Base'), 0, 0)
+        status_layout.addWidget(QLabel('Base-roboclaw'), 0, 0)
         status_layout.addWidget(self.motion_badge, 0, 1)
         status_layout.addWidget(QLabel('Rostro'), 0, 2)
         status_layout.addWidget(self.face_badge, 0, 3)
@@ -397,12 +475,15 @@ class RobotGui(QMainWindow):
         status_layout.addWidget(separator, 1, 0, 1, 4)
 
         self.motion_status_label = QLabel(self.node.motion_text)
+        self.motor_status_label = QLabel(self.node.motor_text)
         self.face_status_label = QLabel(self.node.face_text)
         self.motion_status_label.setWordWrap(True)
+        self.motor_status_label.setWordWrap(True)
         self.face_status_label.setWordWrap(True)
 
         status_layout.addWidget(self.motion_status_label, 2, 0, 1, 4)
-        status_layout.addWidget(self.face_status_label, 3, 0, 1, 4)
+        status_layout.addWidget(self.motor_status_label, 3, 0, 1, 4)
+        status_layout.addWidget(self.face_status_label, 4, 0, 1, 4)
 
         status_box.setLayout(status_layout)
         return status_box
@@ -411,7 +492,7 @@ class RobotGui(QMainWindow):
         label = QLabel('WAIT')
         label.setAlignment(Qt.AlignCenter)
         label.setMinimumHeight(28)
-        label.setMinimumWidth(120)
+        label.setMinimumWidth(180)
         return label
 
     def update_speed_limit(self, value):
@@ -423,7 +504,8 @@ class RobotGui(QMainWindow):
         )
         if hasattr(self, 'max_speed_label'):
             self.max_speed_label.setText(self.limit_label.text())
-        self.send_current_motion(force=True)
+        if hasattr(self, 'axes_label'):
+            self.send_current_motion(force=True)
 
     def set_pad_axes(self, linear_axis, angular_axis):
         self.pad_linear_axis = float(linear_axis)
@@ -434,6 +516,25 @@ class RobotGui(QMainWindow):
         self.button_linear_axis = float(linear_axis)
         self.button_angular_axis = float(angular_axis)
         self.send_current_motion(force=True)
+
+    def toggle_button_motion(self, name, linear_axis, angular_axis):
+        if self.active_motion_button == name:
+            self.active_motion_button = None
+            self.button_linear_axis = 0.0
+            self.button_angular_axis = 0.0
+        else:
+            self.active_motion_button = name
+            self.button_linear_axis = float(linear_axis)
+            self.button_angular_axis = float(angular_axis)
+
+        self.sync_motion_buttons()
+        self.send_current_motion(force=True)
+
+    def sync_motion_buttons(self):
+        for name, button in self.motion_buttons.items():
+            button.blockSignals(True)
+            button.setChecked(name == self.active_motion_button)
+            button.blockSignals(False)
 
     def publish_active_motion(self):
         if self.motion_is_active():
@@ -460,6 +561,8 @@ class RobotGui(QMainWindow):
         self.pad_angular_axis = 0.0
         self.button_linear_axis = 0.0
         self.button_angular_axis = 0.0
+        self.active_motion_button = None
+        self.sync_motion_buttons()
         self.analog_pad.reset(emit_signal=False)
         self.axes_label.setText('Entrada: lineal=+0.00, angular=+0.00')
         self.node.stop_robot()
@@ -489,8 +592,10 @@ class RobotGui(QMainWindow):
         now = time.monotonic()
 
         self.command_label.setText(self.node.motion_text)
+        self.motor_label.setText(self.node.motor_text)
         self.face_label.setText(self.node.face_text)
         self.motion_status_label.setText(self.node.motion_text)
+        self.motor_status_label.setText(self.node.motor_text)
         self.face_status_label.setText(self.node.face_text)
 
         motion_fresh = now - self.node.last_twist_sent <= 1.0
@@ -498,7 +603,7 @@ class RobotGui(QMainWindow):
             self.set_badge(
                 self.motion_badge,
                 'ok' if motion_fresh else 'error',
-                'TX' if motion_fresh else 'TIMEOUT',
+                'CONECTADO' if motion_fresh else 'TIMEOUT',
             )
         elif self.node.last_twist_sent:
             self.set_badge(self.motion_badge, 'ok', 'STOP')
@@ -529,6 +634,18 @@ class RobotGui(QMainWindow):
 
 def clamp(value, minimum, maximum):
     return max(minimum, min(maximum, value))
+
+
+def format_float(value, unit):
+    if value is None:
+        return f'-- {unit}'
+    return f'{value:+.2f} {unit}'
+
+
+def format_int(value, unit):
+    if value is None:
+        return f'-- {unit}'
+    return f'{value:+d} {unit}'
 
 
 def main(args=None):
