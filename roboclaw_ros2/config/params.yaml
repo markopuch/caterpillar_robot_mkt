@@ -1,0 +1,13 @@
+roboclaw_node:
+  ros__parameters:
+    port: "/dev/ttyACM0"
+    baud: 115200
+    address: 128
+    control_rate_hz: 20.0
+    max_speed: 0.5
+    ticks_per_revolution: 2048.0
+    wheel_radius: 0.05
+    base_width: 0.315
+    cmd_vel_timeout: 0.5
+    invert_left_motor: false
+    invert_right_motor: false
