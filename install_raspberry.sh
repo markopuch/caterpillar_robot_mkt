@@ -73,7 +73,13 @@ fi
 source "/opt/ros/${ROS_DISTRO}/setup.bash"
 cd "${WORKSPACE}"
 
-rosdep install --from-paths src --ignore-src -r -y --rosdistro "${ROS_DISTRO}"
+if [ -d src ]; then
+  ROSDEP_PATHS="src"
+else
+  ROSDEP_PATHS="."
+fi
+
+rosdep install --from-paths "${ROSDEP_PATHS}" --ignore-src -r -y --rosdistro "${ROS_DISTRO}"
 colcon build --symlink-install
 
 if ! grep -q "source /opt/ros/${ROS_DISTRO}/setup.bash" "${HOME}/.bashrc"; then
