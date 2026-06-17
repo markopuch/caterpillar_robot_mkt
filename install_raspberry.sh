@@ -1,8 +1,20 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROS_DISTRO="${ROS_DISTRO:-humble}"
-WORKSPACE="${WORKSPACE:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
+# Este proyecto esta preparado para ROS 2 Jazzy.
+ROS_DISTRO="${ROS_DISTRO:-jazzy}"
+if [ "${ROS_DISTRO}" != "jazzy" ]; then
+  echo "ERROR: este proyecto debe instalarse con ROS_DISTRO=jazzy."
+  echo "Ejemplo: ROS_DISTRO=jazzy ./install_raspberry.sh"
+  exit 1
+fi
+
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ "$(basename "$(dirname "${PROJECT_DIR}")")" = "src" ]; then
+  WORKSPACE="${WORKSPACE:-$(dirname "$(dirname "${PROJECT_DIR}")")}"
+else
+  WORKSPACE="${WORKSPACE:-${PROJECT_DIR}}"
+fi
 
 if ! command -v sudo >/dev/null 2>&1; then
   SUDO=""
@@ -10,7 +22,7 @@ else
   SUDO="sudo"
 fi
 
-echo "Installing robot dependencies"
+echo "Installing Caterpillar Robot dependencies"
 echo "ROS_DISTRO=${ROS_DISTRO}"
 echo "WORKSPACE=${WORKSPACE}"
 
@@ -91,10 +103,9 @@ if ! grep -q "source ${WORKSPACE}/install/setup.bash" "${HOME}/.bashrc"; then
 fi
 
 echo
-echo "Installation complete."
-echo "Robot bringup:"
-echo "  source ${WORKSPACE}/install/setup.bash"
-echo "  ros2 launch roboclaw_ros2 mobile_robot.launch.py"
+echo "Installation complete for ROS 2 Jazzy."
+echo "Run robot:"
+echo "  ${PROJECT_DIR}/run_robot.sh robot"
 echo
-echo "Control GUI:"
-echo "  ros2 run interface_pc interface_pc"
+echo "Run control GUI:"
+echo "  ${PROJECT_DIR}/run_robot.sh gui"

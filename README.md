@@ -1,6 +1,7 @@
 # caterpillar_robot_mkt
 
 Robot movil diferencial con RoboClaw y pantalla HDMI para rostros animados.
+El sistema esta preparado para ROS 2 Jazzy.
 
 Desarrollado para un proyecto de la Universidad de Ingenieria y Tecnologia
 (UTEC), Departamento de Mecatronica. Codigo desarrollado por Marko Puchuri.
@@ -35,19 +36,19 @@ Si el usuario fue agregado a `dialout`, reinicia sesion antes de usar
 Robot en Raspberry:
 
 ```bash
-ros2 launch roboclaw_ros2 mobile_robot.launch.py port:=/dev/ttyACM0
+./run_robot.sh robot
 ```
 
 Interfaz de control:
 
 ```bash
-ros2 run interface_pc interface_pc
+./run_robot.sh gui
 ```
 
 Robot e interfaz en la misma Raspberry:
 
 ```bash
-ros2 launch roboclaw_ros2 mobile_robot.launch.py start_control_gui:=true
+./run_robot.sh all
 ```
 
 ## Paquetes
