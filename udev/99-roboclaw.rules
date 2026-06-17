@@ -1,0 +1,2 @@
+# RoboClaw connected as ttyACM0.
+SUBSYSTEM=="tty", KERNEL=="ttyACM0", GROUP:="dialout", MODE:="0666", TAG+="uaccess"

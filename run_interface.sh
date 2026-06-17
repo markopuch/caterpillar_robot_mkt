@@ -4,7 +4,6 @@ set -euo pipefail
 ROS_DISTRO="jazzy"
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WORKSPACE="$(dirname "$(dirname "${PROJECT_DIR}")")"
-ROBOCLAW_PORT="/dev/ttyACM0"
 
 if [ ! -f "/opt/ros/${ROS_DISTRO}/setup.bash" ]; then
   echo "ERROR: ROS 2 ${ROS_DISTRO} is not installed."
@@ -19,4 +18,4 @@ fi
 source "/opt/ros/${ROS_DISTRO}/setup.bash"
 source "${WORKSPACE}/install/setup.bash"
 
-exec ros2 launch roboclaw_ros2 mobile_robot.launch.py port:="${ROBOCLAW_PORT}"
+exec ros2 run interface_pc interface_pc

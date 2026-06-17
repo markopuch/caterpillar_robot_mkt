@@ -1,0 +1,81 @@
+COMANDOS PARA INSTALAR Y EJECUTAR EL ROBOT
+==========================================
+
+Repositorio:
+  cd /home/utec/robot_ws/src/caterpillar_robot_mkt
+
+
+1) Instalar ROS 2 Jazzy
+-----------------------
+  ./install_ros2_jazzy.sh
+
+
+2) Instalar dependencias de paquetes
+------------------------------------
+  ./install_robot_dependencies.sh
+
+Nota:
+  Si el usuario fue agregado a dialout, cerrar sesion y volver a entrar, o
+  reiniciar la Raspberry/laptop antes de usar /dev/ttyACM0.
+
+
+3) Instalar regla udev para RoboClaw en ttyACM0
+-----------------------------------------------
+  ./install_roboclaw_udev.sh
+
+Luego desconectar y volver a conectar el RoboClaw por USB.
+
+Verificar:
+  ls -l /dev/ttyACM0
+
+
+4) Compilar todo el robot
+-------------------------
+  ./build_robot.sh
+
+Este script no tiene opciones. Solo compila el workspace:
+  /home/utec/robot_ws
+
+
+5) Ejecutar robot
+-----------------
+RoboClaw en /dev/ttyACM0 + pantalla HDMI:
+  ./run_robot.sh
+
+Solo interfaz de control:
+  ./run_interface.sh
+
+
+6) Pruebas rapidas por topic
+----------------------------
+Mover hacia adelante:
+  ros2 topic pub --once /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.15}, angular: {z: 0.0}}"
+
+Girar:
+  ros2 topic pub --once /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.0}, angular: {z: 0.5}}"
+
+Detener:
+  ros2 topic pub --once /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.0}, angular: {z: 0.0}}"
+
+Cambiar rostro:
+  ros2 topic pub --once /face_coms_topic std_msgs/msg/String "{data: 'smile'}"
+
+Ver diagnostico de motores:
+  ros2 topic echo /roboclaw/cmd_speed/left
+  ros2 topic echo /roboclaw/cmd_speed/right
+  ros2 topic echo /roboclaw/cmd_ticks/left
+  ros2 topic echo /roboclaw/cmd_ticks/right
+
+
+7) Si el RoboClaw no aparece como ttyACM0
+-----------------------------------------
+Revisar dispositivos:
+  ls -l /dev/ttyACM* /dev/ttyUSB*
+  lsusb
+
+Revisar datos udev:
+  udevadm info -q property -n /dev/ttyACM0
+  udevadm info -a -n /dev/ttyACM0
+
+Este proyecto esta configurado para usar siempre:
+  /dev/ttyACM0

@@ -23,9 +23,12 @@ envia rostros a la pantalla.
 ## Instalacion
 
 ```bash
-chmod +x install_raspberry.sh
-./install_raspberry.sh
-source install/setup.bash
+cd /home/utec/robot_ws/src/caterpillar_robot_mkt
+./install_ros2_jazzy.sh
+./install_robot_dependencies.sh
+./install_roboclaw_udev.sh
+./build_robot.sh
+source ../../install/setup.bash
 ```
 
 Si el usuario fue agregado a `dialout`, reinicia sesion antes de usar
@@ -36,19 +39,13 @@ Si el usuario fue agregado a `dialout`, reinicia sesion antes de usar
 Robot en Raspberry:
 
 ```bash
-./run_robot.sh robot
+./run_robot.sh
 ```
 
 Interfaz de control:
 
 ```bash
-./run_robot.sh gui
-```
-
-Robot e interfaz en la misma Raspberry:
-
-```bash
-./run_robot.sh all
+./run_interface.sh
 ```
 
 ## Paquetes
