@@ -7,21 +7,22 @@ Repositorio:
 
 1) Instalar ROS 2 Jazzy
 -----------------------
-  ./install_ros2_jazzy.sh
+  ./shortcuts/install_ros2_jazzy.sh
 
 
 2) Instalar dependencias de paquetes
 ------------------------------------
-  ./install_robot_dependencies.sh
+  ./shortcuts/install_robot_dependencies.sh
 
 Nota:
-  Si el usuario fue agregado a dialout, cerrar sesion y volver a entrar, o
-  reiniciar la Raspberry/laptop antes de usar /dev/ttyACM0.
+  Este script instala rosbridge_server para la WebApp de rostros.
+  Si el usuario fue agregado a dialout o input, cerrar sesion y volver a
+  entrar, o reiniciar la Raspberry/laptop antes de usar /dev/ttyACM0 o el F710.
 
 
 3) Instalar regla udev para RoboClaw en ttyACM0
 -----------------------------------------------
-  ./install_roboclaw_udev.sh
+  ./shortcuts/install_roboclaw_udev.sh
 
 Luego desconectar y volver a conectar el RoboClaw por USB.
 
@@ -31,7 +32,7 @@ Verificar:
 
 4) Compilar todo el robot
 -------------------------
-  ./build_robot.sh
+  ./shortcuts/build_robot.sh
 
 Este script no tiene opciones. Solo compila el workspace:
   /home/utec/robot_ws
@@ -40,13 +41,16 @@ Este script no tiene opciones. Solo compila el workspace:
 5) Ejecutar robot
 -----------------
 RoboClaw en /dev/ttyACM0 + pantalla HDMI:
-  ./run_robot.sh
+  ./shortcuts/run_robot.sh
 
-Solo interfaz de control:
-  ./run_interface.sh
+Interfaz de control + WebApp de tablet + rosbridge:
+  ./shortcuts/run_interface.sh
+
+Abrir desde la tablet o navegador:
+  http://IP_DEL_ROBOT:8080
 
 RoboClaw + pantalla HDMI + interfaz:
-  ./run_all.sh
+  ./shortcuts/run_all.sh
 
 
 6) Pruebas rapidas por topic
@@ -62,6 +66,14 @@ Detener:
 
 Cambiar rostro:
   ros2 topic pub --once /face_coms_topic std_msgs/msg/String "{data: 'smile'}"
+  ros2 topic pub --once /face/expression std_msgs/msg/String "{data: 'smile'}"
+
+Diagnostico WebApp de rostros:
+  curl http://localhost:8080
+  curl http://localhost:8080/api/faces
+
+Mando Logitech F710:
+  ros2 launch joystick_logitech_f710_gamepad f710_gamepad.launch.py
 
 Ver diagnostico de motores:
   ros2 topic echo /roboclaw/cmd_speed/left

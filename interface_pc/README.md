@@ -22,7 +22,7 @@ ros2 launch interface_pc interface_pc.launch.py
   relativa de las ruedas para girar.
 - Limita la velocidad con un slider.
 - Detiene el robot con `STOP`.
-- Cambia el rostro mostrado en la pantalla HDMI.
+- Cambia el rostro mostrado en la pantalla HDMI y en la WebApp de tablet.
 
 ## Publica
 
@@ -30,6 +30,7 @@ ros2 launch interface_pc interface_pc.launch.py
 | --- | --- | --- |
 | `cmd_vel` | `geometry_msgs/msg/Twist` | `linear.x` y `angular.z`. |
 | `face_coms_topic` | `std_msgs/msg/String` | `blink`, `smile`, `heart`, `fire`, `music`. |
+| `/face/expression` | `std_msgs/msg/String` | Mismos botones de rostro para la WebApp. |
 
 ## Consume
 
@@ -45,7 +46,7 @@ ros2 launch interface_pc interface_pc.launch.py
 ```text
 cmd_vel: linear.x=+0.17 m/s, angular.z=+0.00 rad/s
 Motores: izq=+0.17 m/s (+1108 ticks/s), der=+0.17 m/s (+1108 ticks/s)
-face_coms_topic: smile
+face_coms_topic: smile | /face/expression: smile
 Estado Base-roboclaw: CONECTADO / STOP / WAIT
 Estado Rostro: SENT / WAIT
 ```
@@ -55,4 +56,5 @@ Estado Rostro: SENT / WAIT
 - `Adelante`, `Atras`, `Girar izq`, `Girar der`: quedan activos en verde y
   se desactivan al volver a presionarlos.
 - `STOP`: desactiva el boton activo y manda velocidad cero.
-- Rostros: `Normal`, `Sonrisa`, `Corazon`, `Fuego`, `Musica`.
+- Rostros: `Normal`, `Sonrisa`, `Corazon`, `Fuego`, `Musica`. Cada boton
+  publica en `face_coms_topic` y en `/face/expression`.

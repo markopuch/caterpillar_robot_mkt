@@ -3,7 +3,7 @@ set -euo pipefail
 
 ROS_DISTRO="jazzy"
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-WORKSPACE="$(dirname "$(dirname "${PROJECT_DIR}")")"
+WORKSPACE="$(cd "${PROJECT_DIR}/../../.." && pwd)"
 
 if ! command -v sudo >/dev/null 2>&1; then
   SUDO=""
@@ -36,6 +36,7 @@ ${SUDO} apt install -y \
   "ros-${ROS_DISTRO}-launch" \
   "ros-${ROS_DISTRO}-launch-ros" \
   "ros-${ROS_DISTRO}-rclpy" \
+  "ros-${ROS_DISTRO}-rosbridge-server" \
   "ros-${ROS_DISTRO}-std-msgs"
 
 if [ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]; then
@@ -56,6 +57,13 @@ if [ -n "${SUDO}" ] && id -nG "${USER}" | tr ' ' '\n' | grep -qx dialout; then
 elif [ -n "${SUDO}" ]; then
   ${SUDO} usermod -aG dialout "${USER}"
   echo "Added ${USER} to dialout. Log out and back in, or reboot, before using /dev/ttyACM0."
+fi
+
+if [ -n "${SUDO}" ] && id -nG "${USER}" | tr ' ' '\n' | grep -qx input; then
+  echo "User ${USER} already belongs to input."
+elif [ -n "${SUDO}" ]; then
+  ${SUDO} usermod -aG input "${USER}"
+  echo "Added ${USER} to input. Log out and back in, or reboot, before using /dev/input/js0."
 fi
 
 echo "Robot dependencies installation complete."

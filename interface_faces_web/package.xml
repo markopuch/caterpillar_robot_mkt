@@ -1,18 +1,18 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>caterpillar_bringup</name>
+  <name>interface_faces_web</name>
   <version>0.0.0</version>
-  <description>Launch-only bringup package for the Caterpillar robot.</description>
-  <maintainer email="mpuchuri@utec.edu.pe">mpuchuri</maintainer>
+  <description>Web face interface for a tablet controlled from ROS 2 through rosbridge.</description>
+  <maintainer email="mpuchuri@utec.edu.pe">Marko Puchuri</maintainer>
   <license>Apache-2.0</license>
 
+  <depend>rclpy</depend>
+  <depend>std_msgs</depend>
+  <depend>ament_index_python</depend>
   <exec_depend>launch</exec_depend>
   <exec_depend>launch_ros</exec_depend>
-  <exec_depend>interface_faces_web</exec_depend>
-  <exec_depend>interface_pc</exec_depend>
-  <exec_depend>interface_rpi</exec_depend>
-  <exec_depend>roboclaw_ros2</exec_depend>
+  <exec_depend>rosbridge_server</exec_depend>
 
   <export>
     <build_type>ament_python</build_type>

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Robot Faces</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script defer src="/js/config.js"></script>
+    <script defer src="/js/app.js"></script>
+  </head>
+  <body>
+    <main class="face-stage">
+      <section class="status-bar" aria-live="polite">
+        <div>
+          <span id="connection-dot" class="status-dot disconnected"></span>
+          <span id="connection-label">desconectado</span>
+        </div>
+        <div id="expression-label">idle</div>
+      </section>
+
+      <section class="face-frame">
+        <img id="face-image" alt="rostro del robot">
+        <pre id="json-face" hidden></pre>
+      </section>
+
+      <section id="message-panel" class="message-panel">
+        Esperando conexion con rosbridge...
+      </section>
+    </main>
+  </body>
+</html>

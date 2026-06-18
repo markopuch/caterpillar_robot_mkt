@@ -2,7 +2,8 @@
 set -euo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-RULE_SOURCE="${PROJECT_DIR}/udev/99-roboclaw.rules"
+REPO_DIR="$(cd "${PROJECT_DIR}/.." && pwd)"
+RULE_SOURCE="${REPO_DIR}/udev/99-roboclaw.rules"
 RULE_TARGET="/etc/udev/rules.d/99-roboclaw.rules"
 
 if ! command -v sudo >/dev/null 2>&1; then

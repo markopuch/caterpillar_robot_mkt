@@ -3,7 +3,7 @@ set -euo pipefail
 
 ROS_DISTRO="jazzy"
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-WORKSPACE="$(dirname "$(dirname "${PROJECT_DIR}")")"
+WORKSPACE="$(cd "${PROJECT_DIR}/../../.." && pwd)"
 
 if [ ! -f "/opt/ros/${ROS_DISTRO}/setup.bash" ]; then
   echo "ERROR: ROS 2 ${ROS_DISTRO} is not installed."

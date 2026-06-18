@@ -9,6 +9,7 @@ Desarrollado para un proyecto de la Universidad de Ingenieria y Tecnologia
 ```text
 interface_pc -> cmd_vel -> roboclaw_node -> RoboClaw
 interface_pc -> face_coms_topic -> interface_rpi -> pantalla HDMI
+interface_pc -> /face/expression -> rosbridge -> WebApp tablet
 ```
 
 ## Vista General
@@ -24,34 +25,40 @@ envia rostros a la pantalla.
 
 ```bash
 cd /home/utec/robot_ws/src/caterpillar_robot_mkt
-./install_ros2_jazzy.sh
-./install_robot_dependencies.sh
-./install_roboclaw_udev.sh
-./build_robot.sh
+./shortcuts/install_ros2_jazzy.sh
+./shortcuts/install_robot_dependencies.sh
+./shortcuts/install_roboclaw_udev.sh
+./shortcuts/build_robot.sh
 source ../../install/setup.bash
 ```
 
-Si el usuario fue agregado a `dialout`, reinicia sesion antes de usar
-`/dev/ttyACM0`.
+Si el usuario fue agregado a `dialout` o `input`, reinicia sesion antes de usar
+`/dev/ttyACM0` o el mando F710.
 
 ## Ejecucion
 
 Robot en Raspberry:
 
 ```bash
-./run_robot.sh
+./shortcuts/run_robot.sh
 ```
 
-Interfaz de control:
+Interfaz de control + WebApp de tablet:
 
 ```bash
-./run_interface.sh
+./shortcuts/run_interface.sh
+```
+
+Abrir desde navegador/tablet:
+
+```text
+http://IP_DEL_ROBOT:8080
 ```
 
 Robot e interfaz juntos:
 
 ```bash
-./run_all.sh
+./shortcuts/run_all.sh
 ```
 
 ## Paquetes
@@ -59,7 +66,9 @@ Robot e interfaz juntos:
 | Paquete | Funcion | README |
 | --- | --- | --- |
 | `interface_pc` | GUI para movimiento y rostros. | [`interface_pc/README.md`](interface_pc/README.md) |
+| `interface_faces_web` | WebApp de rostros para tablet via rosbridge. | [`interface_faces_web/README.md`](interface_faces_web/README.md) |
 | `interface_rpi` | Pantalla HDMI de rostros. | [`interface_rpi/README.md`](interface_rpi/README.md) |
+| `joystick_logitech_f710_gamepad` | Mando F710 para movimiento y rostros. | [`../joystick_logitech_F710_gamepad/README.md`](../joystick_logitech_F710_gamepad/README.md) |
 | `roboclaw_ros2` | Puente `cmd_vel` a RoboClaw. | [`roboclaw_ros2/readme.md`](roboclaw_ros2/readme.md) |
 | `caterpillar_bringup` | Launchers `robot`, `interface` y `all`. | [`caterpillar_bringup/README.md`](caterpillar_bringup/README.md) |
 
@@ -69,6 +78,7 @@ Robot e interfaz juntos:
 | --- | --- | --- |
 | `cmd_vel` | `geometry_msgs/msg/Twist` | Movimiento diferencial. |
 | `face_coms_topic` | `std_msgs/msg/String` | Seleccion de rostro. |
+| `/face/expression` | `std_msgs/msg/String` | Seleccion de rostro para tablet web. |
 | `roboclaw/cmd_ticks/left` | `std_msgs/msg/Int32` | Diagnostico ticks lado izquierdo. |
 | `roboclaw/cmd_ticks/right` | `std_msgs/msg/Int32` | Diagnostico ticks lado derecho. |
 

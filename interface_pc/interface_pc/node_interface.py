@@ -31,6 +31,7 @@ from PyQt5.QtWidgets import (
 
 CMD_VEL_TOPIC = 'cmd_vel'
 FACE_TOPIC = 'face_coms_topic'
+WEB_FACE_TOPIC = '/face/expression'
 
 MAX_LINEAR_SPEED_MPS = 0.50
 MAX_ANGULAR_SPEED_RADPS = 1.40
@@ -47,6 +48,7 @@ class RobotGuiNode(Node):
 
         self.cmd_vel_publisher = self.create_publisher(Twist, CMD_VEL_TOPIC, 10)
         self.face_publisher = self.create_publisher(String, FACE_TOPIC, 10)
+        self.web_face_publisher = self.create_publisher(String, WEB_FACE_TOPIC, 10)
         self.create_subscription(
             Float32,
             'roboclaw/cmd_speed/left',
@@ -81,7 +83,7 @@ class RobotGuiNode(Node):
         self.left_motor_ticks = None
         self.right_motor_ticks = None
         self.motion_text = f'{CMD_VEL_TOPIC}: waiting'
-        self.face_text = f'{FACE_TOPIC}: waiting'
+        self.face_text = f'{FACE_TOPIC} / {WEB_FACE_TOPIC}: waiting'
         self.motor_text = 'Motores: esperando roboclaw'
 
     def send_twist(self, linear_x, angular_z, force=False):
@@ -121,9 +123,10 @@ class RobotGuiNode(Node):
         msg = String()
         msg.data = expression
         self.face_publisher.publish(msg)
+        self.web_face_publisher.publish(msg)
 
         self.last_face_sent = time.monotonic()
-        self.face_text = f'{FACE_TOPIC}: {expression}'
+        self.face_text = f'{FACE_TOPIC}: {expression} | {WEB_FACE_TOPIC}: {expression}'
 
     def motor_speed_callback(self, side, value):
         if side == 'left':
