@@ -14,6 +14,8 @@ Con launch:
 ros2 launch roboclaw_ros2 roboclaw_node.launch.py
 ```
 
+El puerto por defecto es `/dev/ttyACM0`.
+
 ## Consume
 
 | Topic | Tipo | Contenido |

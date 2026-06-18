@@ -7,6 +7,7 @@ from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description() -> LaunchDescription:
     params_file = LaunchConfiguration("params_file")
+    port = LaunchConfiguration("port")
 
     return LaunchDescription(
         [
@@ -17,12 +18,17 @@ def generate_launch_description() -> LaunchDescription:
                 ),
                 description="Path to the roboclaw_node parameter file.",
             ),
+            DeclareLaunchArgument(
+                "port",
+                default_value="/dev/ttyACM0",
+                description="Serial port for the RoboClaw controller.",
+            ),
             Node(
                 package="roboclaw_ros2",
                 executable="roboclaw_node",
                 name="roboclaw_node",
                 output="screen",
-                parameters=[params_file],
+                parameters=[params_file, {"port": port}],
             ),
         ]
     )

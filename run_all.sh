@@ -18,4 +18,4 @@ fi
 source "/opt/ros/${ROS_DISTRO}/setup.bash"
 source "${WORKSPACE}/install/setup.bash"
 
-exec ros2 launch caterpillar_bringup robot.launch.py
+exec ros2 launch caterpillar_bringup all.launch.py

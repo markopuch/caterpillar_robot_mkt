@@ -48,6 +48,12 @@ Interfaz de control:
 ./run_interface.sh
 ```
 
+Robot e interfaz juntos:
+
+```bash
+./run_all.sh
+```
+
 ## Paquetes
 
 | Paquete | Funcion | README |
@@ -55,6 +61,7 @@ Interfaz de control:
 | `interface_pc` | GUI para movimiento y rostros. | [`interface_pc/README.md`](interface_pc/README.md) |
 | `interface_rpi` | Pantalla HDMI de rostros. | [`interface_rpi/README.md`](interface_rpi/README.md) |
 | `roboclaw_ros2` | Puente `cmd_vel` a RoboClaw. | [`roboclaw_ros2/readme.md`](roboclaw_ros2/readme.md) |
+| `caterpillar_bringup` | Launchers `robot`, `interface` y `all`. | [`caterpillar_bringup/README.md`](caterpillar_bringup/README.md) |
 
 ## Topics Principales
 

@@ -1,9 +1,9 @@
-from glob import glob
 import os
+from glob import glob
 
 from setuptools import find_packages, setup
 
-package_name = 'interface_pc'
+package_name = 'caterpillar_bringup'
 
 setup(
     name=package_name,
@@ -19,13 +19,6 @@ setup(
     zip_safe=True,
     maintainer='mpuchuri',
     maintainer_email='mpuchuri@utec.edu.pe',
-    author='UTEC - Universidad de Ingenieria y Tecnologia, Lima, Peru',
-    author_email='mpuchuri@utec.edu.pe',
-    description='ROS 2 graphical interface for differential robot control.',
+    description='Launch-only bringup package for the Caterpillar robot.',
     license='Apache-2.0',
-    entry_points={
-        'console_scripts': [
-            'interface_pc = interface_pc.node_interface:main'
-        ],
-    },
 )

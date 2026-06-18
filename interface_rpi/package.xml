@@ -11,6 +11,8 @@
   <depend>rclpy</depend>
   <depend>std_msgs</depend>
   <depend>ament_index_python</depend>
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
   <exec_depend>python3-pyqt5</exec_depend>
 
   <export>

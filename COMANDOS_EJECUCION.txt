@@ -45,6 +45,9 @@ RoboClaw en /dev/ttyACM0 + pantalla HDMI:
 Solo interfaz de control:
   ./run_interface.sh
 
+RoboClaw + pantalla HDMI + interfaz:
+  ./run_all.sh
+
 
 6) Pruebas rapidas por topic
 ----------------------------

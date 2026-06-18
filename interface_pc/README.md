@@ -9,6 +9,12 @@ Raspberry.
 ros2 run interface_pc interface_pc
 ```
 
+Launch individual:
+
+```bash
+ros2 launch interface_pc interface_pc.launch.py
+```
+
 ## Funcion
 
 - Mueve la base con joystick o botones.

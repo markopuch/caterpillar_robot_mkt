@@ -1,19 +1,17 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>interface_pc</name>
+  <name>caterpillar_bringup</name>
   <version>0.0.0</version>
-  <description>ROS 2 graphical interface for differential robot control and face commands.</description>
+  <description>Launch-only bringup package for the Caterpillar robot.</description>
   <maintainer email="mpuchuri@utec.edu.pe">mpuchuri</maintainer>
   <license>Apache-2.0</license>
-  <url type="website">https://www.utec.edu.pe</url>
 
-  <depend>rclpy</depend>
-  <depend>std_msgs</depend>
-  <depend>geometry_msgs</depend>
   <exec_depend>launch</exec_depend>
   <exec_depend>launch_ros</exec_depend>
-  <exec_depend>python3-pyqt5</exec_depend>
+  <exec_depend>interface_pc</exec_depend>
+  <exec_depend>interface_rpi</exec_depend>
+  <exec_depend>roboclaw_ros2</exec_depend>
 
   <export>
     <build_type>ament_python</build_type>

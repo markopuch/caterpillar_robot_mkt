@@ -9,6 +9,12 @@ fullscreen y reproduce secuencias PNG.
 ros2 run interface_rpi interface_rpi
 ```
 
+Launch individual:
+
+```bash
+ros2 launch interface_rpi interface_rpi.launch.py
+```
+
 ## Consume
 
 | Topic | Tipo | Contenido |

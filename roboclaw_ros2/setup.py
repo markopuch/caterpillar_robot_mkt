@@ -4,8 +4,6 @@ from setuptools import find_packages, setup
 
 package_name = 'roboclaw_ros2'
 launch_files = [
-    'launch/mobile_robot.launch.py',
-    'launch/roboclaw_dual.launch.py',
     'launch/roboclaw_node.launch.py',
 ]
 
