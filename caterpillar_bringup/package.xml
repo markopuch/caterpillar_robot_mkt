@@ -12,6 +12,7 @@
   <exec_depend>interface_faces_web</exec_depend>
   <exec_depend>interface_pc</exec_depend>
   <exec_depend>interface_rpi</exec_depend>
+  <exec_depend>joystick_logitech_f710_gamepad</exec_depend>
   <exec_depend>roboclaw_ros2</exec_depend>
 
   <export>
